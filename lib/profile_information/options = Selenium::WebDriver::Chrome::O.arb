@@ -1,0 +1,42 @@
+options = Selenium::WebDriver::Chrome::Options.new
+options.add_argument('--ignore-cerfiticate-errors')
+options.add_argument('--disable-popup-blocking')
+options.add_argument('--disable-translate')
+@driver = Selenium::WebDriver.for :chrome, options: options
+@profile = "https://www.linkedin.com/company/protonshub-technologies/mycompany/"
+@driver.navigate.to("https://www.linkedin.com/login")
+# start login process by entering username
+puts "[INFO]: Entering username"
+@driver.find_element(:name, "session_key").send_keys(ENV["G_USERNAME"])
+# then we'll enter the password
+puts "[INFO]: Entering password"
+@driver.find_element(:name, "session_password").send_keys(ENV["G_PASSWORD"])
+# then we'll click the login button
+puts "[INFO]: Logging in"
+@driver.find_element(:xpath, "//button").click
+# let's wait here to ensure that the page is fully
+# loaded before we navigate to the profile
+wait = Selenium::WebDriver::Wait.new(:timout => 10)
+wait.until {@driver.find_element(:css, "body.ember-application")}
+puts "[INFO]: Navigating to profile #{@profile}"
+@driver.navigate.to(@profile)
+# lets wait for profile page to load
+wait = Selenium::WebDriver::Wait.new(:timout => 10)
+wait.until {@driver.find_element(:css, "div.organization-outlet")}
+puts "[INFO]: Scraping data"
+doc = Nokogiri::HTML(@driver.page_source)
+
+name = doc.css("h1 span[dir=ltr]")
+name = name ? name.text : nil
+tagline = doc.css("p.org-top-card-summary__tagline")
+tagline = tagline ? tagline.text.strip : nil
+description = doc.css("div.org-top-card-summary-info-list__info-item")
+description_content = description ? description.text.split("\n")[1].strip : nil
+city = description ? description.text.split("\n")[3].strip : nil
+followers = description ? description.text.split("\n")[5].strip : nil
+no_of_employees = doc.css("span.org-top-card-secondary-content__see-all")
+no_of_employees = no_of_employees ? no_of_employees.text.strip : nil
+logo = doc.css("div.org-top-card-primary-content__logo-container img").first["src"]
+@driver.navigate.to("https://www.linkedin.com/search/results/people/?currentCompany=%5B%2214473104%22%5D&origin=COMPANY_PAGE_CANNED_SEARCH&sid=ixD")
+doc = Nokogiri::HTML(@driver.page_source)
+lists=doc.css("div.artdeco-card")

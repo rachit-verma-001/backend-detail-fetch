@@ -1,0 +1,43 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  username: postgres
+  password: postgres
+  port: 5432
+  timeout: 5000
+
+
+development:
+  <<: *default
+  database: anything_backend_development
+  username: postgres
+  password: postgres
+  host: localhost
+  pool: 15
+
+# test:
+#   <<: *default
+#   database: cheers_on_demand_backend_test
+
+staging:
+  <<: *default
+  database: anything_backend_development
+
+  # database: <%= ENV.fetch("DB_NAME") { 'cheers_on_demand_backend_staging' } %>
+
+# production:
+#   <<: *default
+#   database: <%= ENV.fetch("DB_NAME") { 'cheers_on_demand_backend_production' } %>
+
+
+production:
+  <<: *default
+  host: detail-fetch-backend.postgres.database.azure.com
+  database: detail-fetch-db
+  username: postgres@detail-fetch-backend
+  password: Protonshub@321
+
+
+
+
+# pg_restore -C -d postgres db.dump
