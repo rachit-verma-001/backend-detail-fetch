@@ -4,7 +4,7 @@ require "json"
 require 'csv'
 
 class Api::V1::LinkedDataController < ApplicationController
-  # before_action :authenticate_api_v1_user!
+  before_action :authenticate_api_v1_user!
   # skip_before_action :verify_authenticity_token
 
   def resync
@@ -45,6 +45,7 @@ class Api::V1::LinkedDataController < ApplicationController
   def search
     #name, city, designation
     company = CompanyDetail.find_by(name:params[:company_name])
+
     if company.present?
       employee_details = company.employees_data
       founder_details = company.founders_data
@@ -58,12 +59,14 @@ class Api::V1::LinkedDataController < ApplicationController
       founder_details = founder_details.where(first_name:params[:first_name]) if params[:first_name].present?
       founder_details = founder_details.where(last_name:params[:last_name]) if params[:last_name].present?
       founder_details = founder_details.where(email:params[:email]) if params[:email].present?
+
       render json:{
         company_detail:company,
         founder_details: founder_details,
         employee_details: employee_details
       }
     else
+
       render json:{success:false, message:"No Such company details present, Please enter valid company details"}, status:422
     end
   end

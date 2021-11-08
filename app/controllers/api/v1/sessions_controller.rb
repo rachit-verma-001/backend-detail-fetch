@@ -3,14 +3,10 @@ module Api
    class SessionsController < Devise::SessionsController
     def create
       user = User.find_by(email:params[:user][:email])
-      # if user && user.confirmed_at?
-
       if user
         return render json: { success: false, message: "Invalid Credentials" }, status: 422 unless warden.authenticate?(auth_options)
-
         @user = warden.authenticate!(auth_options)
         token = Tiddle.create_and_return_token(@user, request)
-        [:one_signal_player_id]
         user_details = {id: @user.id, name: @user.name, email: @user.email, auth_token: token, is_social: false}
         render json: { message: "User successfully logged in", user: user_details,success: true}
       else
