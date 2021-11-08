@@ -34,6 +34,7 @@ class ProfileInformation::FetchInfo
     wait = Selenium::WebDriver::Wait.new(:timout => 10)
     wait.until {@driver.find_element(:css, "div.organization-outlet")}
     puts "[INFO]: Scraping data"
+
     doc = Nokogiri::HTML(@driver.page_source)
 
     name = doc.css("h1 span[dir=ltr]")
@@ -125,8 +126,9 @@ class ProfileInformation::FetchInfo
 
       city = doc.css(:xpath,"//span[@class='text-body-small inline t-black--light break-words']")&.text&.strip
       p "city = #{city}"
-      description = doc.css(:xpath, "//div[contains(@class,'text-body-medium break-words')]")&.text&.strip
+      description = doc.css(:xpath, "//div[@class='text-body-medium break-words']")&.text&.strip
       p "description = #{description}"
+
       designation = description
       p "designation = #{designation}"
       image = doc.css(:xpath,"//img[contains(@width,'200')]")&.text
@@ -159,6 +161,7 @@ class ProfileInformation::FetchInfo
       sleep(2)
       doc = Nokogiri::HTML(@driver.page_source)
 
+
     end
     names
   end
@@ -182,7 +185,7 @@ class ProfileInformation::FetchInfo
 
       city = doc.css(:xpath,"//span[@class='text-body-small inline t-black--light break-words']")&.text&.strip
       p "city = #{city}"
-      description = doc.css(:xpath, "//div[contains(@class,'text-body-medium break-words')]")&.text&.strip
+      description = doc.css(:xpath, "//div[@class='text-body-medium break-words']")&.text&.strip
       p "description = #{description}"
       designation = description
       p "designation = #{designation}"
