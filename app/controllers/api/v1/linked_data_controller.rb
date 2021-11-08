@@ -9,20 +9,28 @@ class Api::V1::LinkedDataController < ApplicationController
 
   def resync
     begin
+
+      options = Selenium::WebDriver::Chrome::Options.new
+      options.add_argument('--ignore-cerfiticate-errors')
+      options.add_argument('--disable-popup-blocking')
+      options.add_argument('--disable-translate')
+      driver = Selenium::WebDriver.for :chrome, options: options
       name = params[:company_name]
       profile = params[:url]+"/people"
       company = CompanyDetail.find_or_create_by(name:name)
-      payload = ProfileInformation::FetchInfo.new.get_data(name, profile, company)
+      payload = ProfileInformation::FetchInfo.new.get_data(name, profile, company, driver)
       render json: payload
     rescue => e
-      render json: {error:e}
+      driver.quit
+      render json:{success:false, message:"No Such company details present, Please enter valid company details"}, status:422
     end
   end
 
   def export_csv
-    name = params[:company_name]
-    url = params[:url]
-    company = CompanyDetail.find_by(name:name,url:url)
+    cname = params[:company_name]
+    url = params[:url]+"/people"
+    company = CompanyDetail.find_by(name:cname,url:url)
+
     if company
       employees = company.employee_details
       temp_csv = CSV.generate(encoding: 'UTF-8') do |csv|
@@ -45,7 +53,6 @@ class Api::V1::LinkedDataController < ApplicationController
   def search
     #name, city, designation
     company = CompanyDetail.find_by(name:params[:company_name])
-
     if company.present?
       employee_details = company.employees_data
       founder_details = company.founders_data
@@ -59,14 +66,12 @@ class Api::V1::LinkedDataController < ApplicationController
       founder_details = founder_details.where(first_name:params[:first_name]) if params[:first_name].present?
       founder_details = founder_details.where(last_name:params[:last_name]) if params[:last_name].present?
       founder_details = founder_details.where(email:params[:email]) if params[:email].present?
-
       render json:{
         company_detail:company,
         founder_details: founder_details,
         employee_details: employee_details
       }
     else
-
       render json:{success:false, message:"No Such company details present, Please enter valid company details"}, status:422
     end
   end
@@ -74,7 +79,9 @@ class Api::V1::LinkedDataController < ApplicationController
 
   def company_info
     begin
-      company = CompanyDetail.find_by(name:params[:company_name], url:params[:url])
+      url = params[:url]+"/people"
+      company = CompanyDetail.find_by(name:params[:company_name], url:url)
+
       if company
         employees = company.employee_details
         render json:{
