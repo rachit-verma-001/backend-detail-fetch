@@ -11,29 +11,36 @@ class ProfileInformation::FetchInfo
   def login
     @driver.navigate.to("https://www.linkedin.com/login")
     puts "[INFO]: Entering username"
-    # @driver.find_element(:name, "session_key").send_keys("kushal@ausavi.com")
-    # puts "[INFO]: Entering password"
-    # @driver.find_element(:name, "session_password").send_keys("Punjab2017@")
-    @driver.find_element(:name, "session_key").send_keys("rachitverma.001@gmail.com")
+    @driver.find_element(:name, "session_key").send_keys("kushal@ausavi.com")
     puts "[INFO]: Entering password"
-    @driver.find_element(:name, "session_password").send_keys("gmail8871338693")
+    @driver.find_element(:name, "session_password").send_keys("Punjab2017@")
+    # @driver.find_element(:name, "session_key").send_keys("rachitverma.001@gmail.com")
+    # puts "[INFO]: Entering password"
+    # @driver.find_element(:name, "session_password").send_keys("gmail8871338693")
     puts "[INFO]: Logging in"
+
     @driver.find_element(:xpath, "//button").click
     # sleep(3)
+
     wait = Selenium::WebDriver::Wait.new(:timout => 10)
     wait.until {@driver.find_element(:css, "body.ember-application")}
+
+
     company_data
   end
 
   def company_data
     puts "[INFO]: Navigating to profile #{@profile}"
 
+
     @driver.navigate.to(@profile)
     wait = Selenium::WebDriver::Wait.new(:timout => 10)
     wait.until {@driver.find_element(:css, "div.organization-outlet")}
     puts "[INFO]: Scraping data"
 
+
     doc = Nokogiri::HTML(@driver.page_source)
+
 
     name = doc.css("h1 span[dir=ltr]")
     name = name ? name.text : nil
@@ -71,7 +78,8 @@ class ProfileInformation::FetchInfo
     founders << get_founders('coo')
     founders <<  get_founders('cto')
 
-    # employers_data= get_employee_data
+
+    employers_data= get_employee_data
 
     payload = {
       name: @name,
@@ -192,33 +200,78 @@ class ProfileInformation::FetchInfo
     doc = Nokogiri::HTML(source)
 
     p "navigated employees"
+    names = []
+    check=[]
+    i = 0
+    j=0
 
-    names = doc.css("div.org-people-profile-card__profile-title")&.text.split("\n")&.reject(&:blank?)&.collect(&:strip)
+    loop do
+      a = names
+      names = doc.css("div.org-people-profile-card__profile-title")&.text.split("\n")&.reject(&:blank?)&.collect(&:strip)
+      p "names = #{names}"
+      if a.count == names.count
+        break
+      else
+        i=i+1
+        @driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
+        sleep(2)
+        source = @driver.page_source
+        doc = Nokogiri::HTML(source)
+      end
+    end
+
     p "================================="
-
     names.each do |name|
       p "inside name = #{name}"
-      @driver.find_element(:xpath,"//div[@class='org-people-profile-card__profile-title t-black lt-line-clamp lt-line-clamp--single-line ember-view'][contains(.,'#{name}')]")&.click
+      @driver.find_element(:xpath,"(//input[contains(@type,'text')])[2]").send_keys(name)
       sleep(2)
-      doc = Nokogiri::HTML(@driver.page_source)
+      @driver.find_element(:xpath,"(//input[contains(@type,'text')])[2]").send_keys("\n")
+      sleep(3)
+      source = @driver.page_source
+      doc = Nokogiri::HTML(source)
+      sleep(4)
+
+      unless doc.css(:xpath,"//span[@class='t-20 t-black t-bold']").text.strip.first.to_i>=1
+        @driver.navigate.to("#{@profile}")
+        sleep(2)
+        first_name = name.split.first
+        @driver.find_element(:xpath,"(//input[contains(@type,'text')])[2]").send_keys(first_name)
+        sleep(2)
+        @driver.find_element(:xpath,"(//input[contains(@type,'text')])[2]").send_keys("\n")
+        sleep(3)
+        source = @driver.page_source
+        doc = Nokogiri::HTML(source)
+        sleep(4)
+      end
+
+      @driver.find_element(:xpath,"//div[@class='org-people-profile-card__profile-title t-black lt-line-clamp lt-line-clamp--single-line ember-view'][contains(.,'#{name}')]")&.click
+
+      sleep(4)
+
+      wait = Selenium::WebDriver::Wait.new(:timout => 10)
+      wait.until {@driver.find_element(:css, "div.text-body-medium")}
+
+      source = @driver.page_source
+
+      doc = Nokogiri::HTML(source)
 
       city = doc.css(:xpath,"//span[@class='text-body-small inline t-black--light break-words']")&.text&.strip
       p "city = #{city}"
       description = doc.css(:xpath, "//div[@class='text-body-medium break-words']")&.text&.strip
       p "description = #{description}"
+
       designation = description
       p "designation = #{designation}"
 
-      image = doc.css(:xpath,"//img[@width='200']")&.first ? doc.css(:xpath,"//img[@width='200']")&.first['src'] : ""
-
-
-
-      # image = doc.css(:xpath,"//img[@class='pv-top-card-profile-picture__image pv-top-card-profile-picture__image--show ember-view']")&.text
+      image = doc.css(:xpath,"//img[@width='200']")&.first['src']
       p "image = #{image}"
 
       @driver.find_element(:xpath, "//a[contains(.,'Contact info')]")&.click
       sleep(2)
-      doc = Nokogiri::HTML(@driver.page_source)
+
+
+      source = @driver.page_source
+      doc = Nokogiri::HTML(source)
 
       mobile = doc.css(:xpath,"//span[@class='t-14 t-black t-normal']")&.text&.strip
       p "mobile = #{mobile}"
@@ -233,17 +286,20 @@ class ProfileInformation::FetchInfo
         mobile_no:mobile,
         designation: designation,
         image: image,
-        role_id:Role.find_by(name:'Employee')&.id
+        role_id:Role.find_by(name:'Employee').id
       }
+
       p "payoad = #{payload}"
 
-      @company.employee_details.create!(payload) unless @company.employee_details.where(first_name:payload[:first_name], last_name:payload[:last_name], email:payload[:email]).first.present?
+      detail = @company.employee_details.where(first_name:payload[:first_name], last_name:payload[:last_name], email:payload[:email]).first
+
+      @company.employee_details.create!(payload) unless detail.present?
 
       @driver.navigate.to("#{@profile}")
-
       sleep(2)
-      doc = Nokogiri::HTML(@driver.page_source)
-
+      source = @driver.page_source
+      doc = Nokogiri::HTML(source)
+      sleep(3)
 
     end
     names

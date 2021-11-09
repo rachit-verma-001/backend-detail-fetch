@@ -9,34 +9,37 @@ class Api::V1::LinkedDataController < ApplicationController
 
   def resync
     begin
-
       options = Selenium::WebDriver::Chrome::Options.new
       options.add_argument('--ignore-cerfiticate-errors')
       options.add_argument('--disable-popup-blocking')
       options.add_argument('--disable-translate')
       driver = Selenium::WebDriver.for :chrome, options: options
       name = params[:company_name]
+      company = CompanyDetail.find_by(name:name)
+      company.destroy! if company.present?
       profile = params[:url]+"/people"
       company = CompanyDetail.find_or_create_by(name:name)
       payload = ProfileInformation::FetchInfo.new.get_data(name, profile, company, driver)
       render json: payload
     rescue => e
       driver.quit
-      render json:{success:false, message:"No Such company details present, Please enter valid company details"}, status:422
+      # render json:{success:false, message:"No Such company details present, Please enter valid company details"}, status:422
+      render json:{success:false, message:e}, status:422
     end
   end
 
   def export_csv
     cname = params[:company_name]
     url = params[:url]+"/people"
-    company = CompanyDetail.find_by(name:cname,url:url)
+    # company = CompanyDetail.find_by(name:cname,url:url)
+    company = CompanyDetail.find_by(name:cname)
 
     if company
       employees = company.employee_details
       temp_csv = CSV.generate(encoding: 'UTF-8') do |csv|
-        csv << %w[first_name last_name city designation email image description]
+        csv << %w[first_name last_name city designation email image]
         employees.each do |employee|
-          csv << [employee.first_name, employee.last_name, employee.city, employee.designation, employee.email]
+          csv << [employee.first_name, employee.last_name, employee.city, employee.designation, employee.email, employee.image]
         end
       end
 
@@ -78,7 +81,9 @@ class Api::V1::LinkedDataController < ApplicationController
   def company_info
     begin
       url = params[:url]+"/people"
-      company = CompanyDetail.find_by(name:params[:company_name], url:url)
+      # company = CompanyDetail.find_by(name:params[:company_name], url:url)
+      # binding.pry
+      company = CompanyDetail.find_by(name:params[:company_name])
 
       if company
         employees = company.employee_details
