@@ -4,6 +4,8 @@ Rails.application.configure do
   # Code is not reloaded between requests.
   config.cache_classes = true
 
+
+  config.secret_key_base = "744828561dacfa4fd710e4fbcfd4c60f16d034d7f5492ba7b08afecede8378cc4c2e0e66ec1263ab1fdb3bfde24a4bfe46060ffac1e7415022adff1673229f86"
   # Eager load code on boot. This eager loads most of Rails and
   # your application in memory, allowing both threaded web servers
   # and those relying on copy on write to perform better.
@@ -51,7 +53,7 @@ Rails.application.configure do
 
   # Use a real queuing backend for Active Job (and separate queues per environment).
   # config.active_job.queue_adapter     = :resque
-  # config.active_job.queue_name_prefix = "testapp_production"
+  # config.active_job.queue_name_prefix = "anything_api_production"
 
   config.action_mailer.perform_caching = false
 
@@ -81,6 +83,40 @@ Rails.application.configure do
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
+
+
+  config.action_mailer.default_url_options = { host: 'https://react-fetch-detail.herokuapp.com'}
+  # config.action_mailer.delivery_method = :letter_opener
+
+  config.action_mailer.perform_deliveries = false
+  config.action_mailer.raise_delivery_errors = true
+
+  # config.action_mailer.perform_caching = false
+
+  config.action_mailer.delivery_method = :smtp
+
+  # SMTP settings for gmail
+  config.action_mailer.smtp_settings = {
+    :address              => "smtp.gmail.com",
+    :port                 => 587,
+    :user_name            => "rachitverma.001@gmail.com",
+    :password             => "gmail0028871338693",
+    :authentication       => "plain",
+    :enable_starttls_auto => true
+  }
+
+#   config.action_mailer.smtp_settings = {
+#     address:              'smtp.sendgrid.net',
+#     port:                 587,
+#     domain:               'fetch-detail.heroku.com',
+#     user_name:            'apikey',
+#     password:             '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',
+#     enable_starttls_auto: true,
+#     content_type:          "text/html"
+#  }
+
+
+
 
   # Inserts middleware to perform automatic connection switching.
   # The `database_selector` hash is used to pass options to the DatabaseSelector

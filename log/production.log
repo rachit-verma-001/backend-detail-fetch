@@ -1,0 +1,97 @@
+D, [2021-10-29T14:29:25.809816 #22554] DEBUG -- :   [1m[35m (216.3ms)[0m  [1m[35mCREATE TABLE "schema_migrations" ("version" character varying NOT NULL PRIMARY KEY)[0m
+D, [2021-10-29T14:29:26.122516 #22554] DEBUG -- :   [1m[35m (166.1ms)[0m  [1m[35mCREATE TABLE "ar_internal_metadata" ("key" character varying NOT NULL PRIMARY KEY, "value" character varying, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)[0m
+D, [2021-10-29T14:29:28.842726 #22554] DEBUG -- :   [1m[35m (141.3ms)[0m  [1m[34mSELECT pg_try_advisory_lock(5534957957671719465)[0m
+D, [2021-10-29T14:29:29.150232 #22554] DEBUG -- :   [1m[35m (142.8ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+I, [2021-10-29T14:29:29.152179 #22554]  INFO -- : Migrating to DeviseTokenAuthCreateUsers (20191017001759)
+D, [2021-10-29T14:29:29.303811 #22554] DEBUG -- :   [1m[35m (142.9ms)[0m  [1m[35mBEGIN[0m
+D, [2021-10-29T14:29:30.620313 #22554] DEBUG -- :   [1m[35m (747.9ms)[0m  [1m[35mCREATE TABLE "users" ("id" bigserial primary key, "provider" character varying DEFAULT 'email' NOT NULL, "uid" character varying DEFAULT '' NOT NULL, "encrypted_password" character varying DEFAULT '' NOT NULL, "reset_password_token" character varying, "reset_password_sent_at" timestamp, "allow_password_change" boolean DEFAULT FALSE, "remember_created_at" timestamp, "confirmation_token" character varying, "confirmed_at" timestamp, "confirmation_sent_at" timestamp, "unconfirmed_email" character varying, "name" character varying, "nickname" character varying, "image" character varying, "email" character varying, "tokens" json, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)[0m
+D, [2021-10-29T14:29:31.199697 #22554] DEBUG -- :   [1m[35m (149.4ms)[0m  [1m[35mCREATE UNIQUE INDEX  "index_users_on_email" ON "users"  ("email")[0m
+D, [2021-10-29T14:29:31.635405 #22554] DEBUG -- :   [1m[35m (151.1ms)[0m  [1m[35mCREATE UNIQUE INDEX  "index_users_on_uid_and_provider" ON "users"  ("uid", "provider")[0m
+D, [2021-10-29T14:29:32.073776 #22554] DEBUG -- :   [1m[35m (152.3ms)[0m  [1m[35mCREATE UNIQUE INDEX  "index_users_on_reset_password_token" ON "users"  ("reset_password_token")[0m
+D, [2021-10-29T14:29:32.510226 #22554] DEBUG -- :   [1m[35m (152.4ms)[0m  [1m[35mCREATE UNIQUE INDEX  "index_users_on_confirmation_token" ON "users"  ("confirmation_token")[0m
+D, [2021-10-29T14:29:32.803431 #22554] DEBUG -- :   [1m[36mActiveRecord::SchemaMigration Create (142.6ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20191017001759"]]
+D, [2021-10-29T14:29:32.963666 #22554] DEBUG -- :   [1m[35m (159.6ms)[0m  [1m[35mCOMMIT[0m
+I, [2021-10-29T14:29:32.963918 #22554]  INFO -- : Migrating to AddTrackableFieldsToUser (20191017012211)
+D, [2021-10-29T14:29:33.200986 #22554] DEBUG -- :   [1m[35m (229.8ms)[0m  [1m[35mBEGIN[0m
+D, [2021-10-29T14:29:33.575924 #22554] DEBUG -- :   [1m[35m (233.0ms)[0m  [1m[35mALTER TABLE "users" ADD "sign_in_count" integer DEFAULT 0 NOT NULL[0m
+D, [2021-10-29T14:29:33.717849 #22554] DEBUG -- :   [1m[35m (141.2ms)[0m  [1m[35mALTER TABLE "users" ADD "current_sign_in_at" timestamp[0m
+D, [2021-10-29T14:29:33.860266 #22554] DEBUG -- :   [1m[35m (141.8ms)[0m  [1m[35mALTER TABLE "users" ADD "last_sign_in_at" timestamp[0m
+D, [2021-10-29T14:29:34.004948 #22554] DEBUG -- :   [1m[35m (141.2ms)[0m  [1m[35mALTER TABLE "users" ADD "current_sign_in_ip" inet[0m
+D, [2021-10-29T14:29:34.148998 #22554] DEBUG -- :   [1m[35m (143.4ms)[0m  [1m[35mALTER TABLE "users" ADD "last_sign_in_ip" inet[0m
+D, [2021-10-29T14:29:34.291570 #22554] DEBUG -- :   [1m[36mActiveRecord::SchemaMigration Create (140.6ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20191017012211"]]
+D, [2021-10-29T14:29:35.465564 #22554] DEBUG -- :   [1m[35m (1173.4ms)[0m  [1m[35mCOMMIT[0m
+I, [2021-10-29T14:29:35.465811 #22554]  INFO -- : Migrating to CreateAuthenticationTokens (20210924085010)
+D, [2021-10-29T14:29:35.619615 #22554] DEBUG -- :   [1m[35m (143.7ms)[0m  [1m[35mBEGIN[0m
+D, [2021-10-29T14:29:35.799250 #22554] DEBUG -- :   [1m[35m (179.2ms)[0m  [1m[35mCREATE TABLE "authentication_tokens" ("id" bigserial primary key, "body" character varying, "user_id" bigint NOT NULL, "last_used_at" timestamp, "expires_in" integer, "ip_address" character varying, "user_agent" character varying, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_ad331ebb27"
+FOREIGN KEY ("user_id")
+  REFERENCES "users" ("id")
+)[0m
+D, [2021-10-29T14:29:36.241161 #22554] DEBUG -- :   [1m[35m (157.6ms)[0m  [1m[35mCREATE  INDEX  "index_authentication_tokens_on_user_id" ON "authentication_tokens"  ("user_id")[0m
+D, [2021-10-29T14:29:36.680230 #22554] DEBUG -- :   [1m[35m (153.6ms)[0m  [1m[35mCREATE  INDEX  "index_authentication_tokens_on_body" ON "authentication_tokens"  ("body")[0m
+D, [2021-10-29T14:29:36.823244 #22554] DEBUG -- :   [1m[36mActiveRecord::SchemaMigration Create (142.1ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20210924085010"]]
+D, [2021-10-29T14:29:36.984504 #22554] DEBUG -- :   [1m[35m (159.7ms)[0m  [1m[35mCOMMIT[0m
+I, [2021-10-29T14:29:36.984815 #22554]  INFO -- : Migrating to AddConfirmationOtpToUsers (20211004064132)
+D, [2021-10-29T14:29:37.129161 #22554] DEBUG -- :   [1m[35m (140.9ms)[0m  [1m[35mBEGIN[0m
+D, [2021-10-29T14:29:37.271157 #22554] DEBUG -- :   [1m[35m (141.6ms)[0m  [1m[35mALTER TABLE "users" ADD "confirmation_otp" character varying[0m
+D, [2021-10-29T14:29:37.416617 #22554] DEBUG -- :   [1m[36mActiveRecord::SchemaMigration Create (141.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20211004064132"]]
+D, [2021-10-29T14:29:37.569891 #22554] DEBUG -- :   [1m[35m (152.7ms)[0m  [1m[35mCOMMIT[0m
+I, [2021-10-29T14:29:37.570133 #22554]  INFO -- : Migrating to CreateEmployeeDetails (20211008085204)
+D, [2021-10-29T14:29:37.717189 #22554] DEBUG -- :   [1m[35m (141.1ms)[0m  [1m[35mBEGIN[0m
+D, [2021-10-29T14:29:37.901562 #22554] DEBUG -- :   [1m[35m (184.1ms)[0m  [1m[35mCREATE TABLE "employee_details" ("id" bigserial primary key, "first_name" character varying, "last_name" character varying, "city" character varying, "description" character varying, "email" character varying, "connection" character varying, "designation" character varying, "image" character varying, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)[0m
+D, [2021-10-29T14:29:38.045425 #22554] DEBUG -- :   [1m[36mActiveRecord::SchemaMigration Create (143.0ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20211008085204"]]
+D, [2021-10-29T14:29:38.190170 #22554] DEBUG -- :   [1m[35m (144.2ms)[0m  [1m[35mCOMMIT[0m
+I, [2021-10-29T14:29:38.190414 #22554]  INFO -- : Migrating to CreateCompanyDetails (20211013051625)
+D, [2021-10-29T14:29:38.336590 #22554] DEBUG -- :   [1m[35m (140.5ms)[0m  [1m[35mBEGIN[0m
+D, [2021-10-29T14:29:38.506749 #22554] DEBUG -- :   [1m[35m (169.7ms)[0m  [1m[35mCREATE TABLE "company_details" ("id" bigserial primary key, "name" character varying, "tagline" character varying, "description" character varying, "city" character varying, "followers" character varying, "no_of_employees" integer, "logo" character varying, "founders_count" integer, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)[0m
+D, [2021-10-29T14:29:38.651228 #22554] DEBUG -- :   [1m[36mActiveRecord::SchemaMigration Create (142.4ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20211013051625"]]
+D, [2021-10-29T14:29:38.802197 #22554] DEBUG -- :   [1m[35m (146.6ms)[0m  [1m[35mCOMMIT[0m
+I, [2021-10-29T14:29:38.802482 #22554]  INFO -- : Migrating to CreateRoles (20211013064937)
+D, [2021-10-29T14:29:38.948273 #22554] DEBUG -- :   [1m[35m (140.9ms)[0m  [1m[35mBEGIN[0m
+D, [2021-10-29T14:29:39.121772 #22554] DEBUG -- :   [1m[35m (173.0ms)[0m  [1m[35mCREATE TABLE "roles" ("id" bigserial primary key, "name" character varying, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)[0m
+D, [2021-10-29T14:29:39.267463 #22554] DEBUG -- :   [1m[36mActiveRecord::SchemaMigration Create (140.9ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20211013064937"]]
+D, [2021-10-29T14:29:39.411974 #22554] DEBUG -- :   [1m[35m (143.8ms)[0m  [1m[35mCOMMIT[0m
+I, [2021-10-29T14:29:39.412261 #22554]  INFO -- : Migrating to AddRoleIdToEmployeeDetail (20211013065423)
+D, [2021-10-29T14:29:39.556607 #22554] DEBUG -- :   [1m[35m (140.8ms)[0m  [1m[35mBEGIN[0m
+D, [2021-10-29T14:29:39.697806 #22554] DEBUG -- :   [1m[35m (140.8ms)[0m  [1m[35mALTER TABLE "employee_details" ADD "role_id" integer[0m
+D, [2021-10-29T14:29:39.841196 #22554] DEBUG -- :   [1m[36mActiveRecord::SchemaMigration Create (141.3ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20211013065423"]]
+D, [2021-10-29T14:29:39.994712 #22554] DEBUG -- :   [1m[35m (149.7ms)[0m  [1m[35mCOMMIT[0m
+I, [2021-10-29T14:29:39.994900 #22554]  INFO -- : Migrating to AddMobileNoInEmployeeDetails (20211014094642)
+D, [2021-10-29T14:29:40.138779 #22554] DEBUG -- :   [1m[35m (140.8ms)[0m  [1m[35mBEGIN[0m
+D, [2021-10-29T14:29:40.280563 #22554] DEBUG -- :   [1m[35m (141.3ms)[0m  [1m[35mALTER TABLE "employee_details" ADD "mobile_no" character varying[0m
+D, [2021-10-29T14:29:40.426699 #22554] DEBUG -- :   [1m[36mActiveRecord::SchemaMigration Create (141.4ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20211014094642"]]
+D, [2021-10-29T14:29:40.571129 #22554] DEBUG -- :   [1m[35m (143.8ms)[0m  [1m[35mCOMMIT[0m
+I, [2021-10-29T14:29:40.571454 #22554]  INFO -- : Migrating to AddUrlInCompanyDetails (20211026044600)
+D, [2021-10-29T14:29:40.715750 #22554] DEBUG -- :   [1m[35m (140.7ms)[0m  [1m[35mBEGIN[0m
+D, [2021-10-29T14:29:40.857713 #22554] DEBUG -- :   [1m[35m (141.6ms)[0m  [1m[35mALTER TABLE "company_details" ADD "url" character varying[0m
+D, [2021-10-29T14:29:40.999760 #22554] DEBUG -- :   [1m[36mActiveRecord::SchemaMigration Create (140.7ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20211026044600"]]
+D, [2021-10-29T14:29:41.143891 #22554] DEBUG -- :   [1m[35m (143.6ms)[0m  [1m[35mCOMMIT[0m
+I, [2021-10-29T14:29:41.144137 #22554]  INFO -- : Migrating to AddCompanyReferenceToEmployeeDetails (20211026044646)
+D, [2021-10-29T14:29:41.290046 #22554] DEBUG -- :   [1m[35m (140.8ms)[0m  [1m[35mBEGIN[0m
+D, [2021-10-29T14:29:41.432838 #22554] DEBUG -- :   [1m[35m (142.4ms)[0m  [1m[35mALTER TABLE "employee_details" ADD "company_detail_id" integer[0m
+D, [2021-10-29T14:29:41.577016 #22554] DEBUG -- :   [1m[36mActiveRecord::SchemaMigration Create (141.9ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"[0m  [["version", "20211026044646"]]
+D, [2021-10-29T14:29:41.721823 #22554] DEBUG -- :   [1m[35m (144.1ms)[0m  [1m[35mCOMMIT[0m
+D, [2021-10-29T14:29:42.300446 #22554] DEBUG -- :   [1m[36mActiveRecord::InternalMetadata Load (141.7ms)[0m  [1m[34mSELECT "ar_internal_metadata".* FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = $1 LIMIT $2[0m  [["key", "environment"], ["LIMIT", 1]]
+D, [2021-10-29T14:29:42.600707 #22554] DEBUG -- :   [1m[35m (140.5ms)[0m  [1m[35mBEGIN[0m
+D, [2021-10-29T14:29:42.745259 #22554] DEBUG -- :   [1m[36mActiveRecord::InternalMetadata Create (143.7ms)[0m  [1m[32mINSERT INTO "ar_internal_metadata" ("key", "value", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "key"[0m  [["key", "environment"], ["value", "production"], ["created_at", "2021-10-29 08:59:42.459066"], ["updated_at", "2021-10-29 08:59:42.459066"]]
+D, [2021-10-29T14:29:42.893682 #22554] DEBUG -- :   [1m[35m (147.6ms)[0m  [1m[35mCOMMIT[0m
+D, [2021-10-29T14:29:43.037052 #22554] DEBUG -- :   [1m[35m (142.9ms)[0m  [1m[34mSELECT pg_advisory_unlock(5534957957671719465)[0m
+I, [2021-10-29T18:53:43.066108 #8517]  INFO -- : [1df22888-03e9-43f2-9584-cfb16a0d0a16] Started POST "/api/v1/users" for 127.0.0.1 at 2021-10-29 18:53:43 +0530
+I, [2021-10-29T18:53:43.070195 #8517]  INFO -- : [1df22888-03e9-43f2-9584-cfb16a0d0a16] Processing by Api::V1::RegistrationsController#create as */*
+I, [2021-10-29T18:53:43.070357 #8517]  INFO -- : [1df22888-03e9-43f2-9584-cfb16a0d0a16]   Parameters: {"user"=>{"email"=>"po12w9i2@yopmail.com", "password"=>"[FILTERED]", "password_confirmation"=>"[FILTERED]"}, "registration"=>{"user"=>{"email"=>"po12w9i2@yopmail.com", "password"=>"[FILTERED]", "password_confirmation"=>"[FILTERED]"}}}
+I, [2021-10-29T18:53:44.690579 #8517]  INFO -- : [1df22888-03e9-43f2-9584-cfb16a0d0a16] Completed 500 Internal Server Error in 1620ms (Allocations: 1397)
+F, [2021-10-29T18:53:44.692709 #8517] FATAL -- : [1df22888-03e9-43f2-9584-cfb16a0d0a16]   
+[1df22888-03e9-43f2-9584-cfb16a0d0a16] ActiveRecord::NoDatabaseError (FATAL:  no pg_hba.conf entry for host "223.236.58.252", user "postgres", database "detail-fetch-db", SSL on
+FATAL:  SSL connection is required. Please specify SSL options and retry.
+):
+[1df22888-03e9-43f2-9584-cfb16a0d0a16]   
+[1df22888-03e9-43f2-9584-cfb16a0d0a16] app/controllers/api/v1/registrations_controller.rb:11:in `create'
+I, [2021-10-29T18:54:26.426808 #8517]  INFO -- : [97c4e2ec-b55d-46a4-9dd2-d1b83decb878] Started POST "/api/v1/users" for 127.0.0.1 at 2021-10-29 18:54:26 +0530
+I, [2021-10-29T18:54:26.427987 #8517]  INFO -- : [97c4e2ec-b55d-46a4-9dd2-d1b83decb878] Processing by Api::V1::RegistrationsController#create as */*
+I, [2021-10-29T18:54:26.428134 #8517]  INFO -- : [97c4e2ec-b55d-46a4-9dd2-d1b83decb878]   Parameters: {"user"=>{"email"=>"po12w9i2@yopmail.com", "password"=>"[FILTERED]", "password_confirmation"=>"[FILTERED]"}, "registration"=>{"user"=>{"email"=>"po12w9i2@yopmail.com", "password"=>"[FILTERED]", "password_confirmation"=>"[FILTERED]"}}}
+I, [2021-10-29T18:54:27.780200 #8517]  INFO -- : [97c4e2ec-b55d-46a4-9dd2-d1b83decb878] Completed 500 Internal Server Error in 1352ms (Allocations: 614)
+F, [2021-10-29T18:54:27.781377 #8517] FATAL -- : [97c4e2ec-b55d-46a4-9dd2-d1b83decb878]   
+[97c4e2ec-b55d-46a4-9dd2-d1b83decb878] ActiveRecord::NoDatabaseError (FATAL:  no pg_hba.conf entry for host "223.236.58.252", user "postgres", database "detail-fetch-db", SSL on
+FATAL:  SSL connection is required. Please specify SSL options and retry.
+):
+[97c4e2ec-b55d-46a4-9dd2-d1b83decb878]   
+[97c4e2ec-b55d-46a4-9dd2-d1b83decb878] app/controllers/api/v1/registrations_controller.rb:11:in `create'
