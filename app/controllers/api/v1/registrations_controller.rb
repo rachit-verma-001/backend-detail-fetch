@@ -72,7 +72,6 @@ module Api
     unless current_user
       render json: {message: 'Invalid Credentials',success: false}
     else
-    binding.pry
       current_user.update(password: params[:update_password])
       render json: {success: true, message: "Password changed successfully"}
     end

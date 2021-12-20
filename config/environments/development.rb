@@ -63,6 +63,10 @@ Rails.application.configure do
     :enable_starttls_auto => true
   }
 
+  # config.hosts << "cb44-182-77-7-232.ngrok.io"
+
+
+  config.hosts << "azure-test-vm-window.eastus.cloudapp.azure.com"
 
   # Raises error for missing translations.
   # config.action_view.raise_on_missing_translations = true

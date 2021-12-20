@@ -18,12 +18,21 @@ gem 'puma', '~> 3.11'
 
 # Use Active Storage variant
 # gem 'image_processing', '~> 1.2'
-
+gem 'kaminari'
 # Reduces boot times through caching; required in config/boot.rb
 gem 'devise'
 gem 'bootsnap', '>= 1.4.2', require: false
 # gem 'devise_token_auth'
 gem 'tiddle'
+gem "httparty"
+
+
+gem 'will_paginate'
+gem 'country_select'
+gem 'countries'
+gem 'carmen-rails'
+gem 'city-state'
+gem 'active_model_serializers', '~> 0.10.0'
 
 gem 'linkedin-scraper'
 

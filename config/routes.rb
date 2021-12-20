@@ -15,7 +15,15 @@ Rails.application.routes.draw do
 
 
       devise_for :users, controllers: { sessions: 'api/v1/sessions', registrations: 'api/v1/registrations' }
-
+      resources :companies do
+        collection do
+          delete :destroy_all
+        end
+        member do
+          get :employees
+          get :resyncing
+        end
+      end
       devise_scope :user do
         put 'change_password', to: 'registrations#change_password'
         post 'forgot_password', to: 'registrations#forgot_password'
