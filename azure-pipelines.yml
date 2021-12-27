@@ -3,8 +3,8 @@
   inputs:
     browserstackProduct: 'automate'
 
-- trigger:
-   master
+ trigger:
+  - master
 
 - pool:
     vmImage: ubuntu-latest
