@@ -2,7 +2,7 @@
 - task: BrowserStackResults@1
   inputs:
     browserstackProduct: 'automate'
-
+-|
  trigger:
   - master
 
