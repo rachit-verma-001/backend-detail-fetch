@@ -1,10 +1,16 @@
 class ApplicationController < ActionController::API
 
   # include DeviseTokenAuth::Concerns::SetUserByToken
+  # protect_from_forgery
   before_action :check_route
   rescue_from Exception, :with => :error_generic
   include ActionController::MimeResponds
   def check_route
+    
+    # if request.host == "azure-test-vm-window.eastus.cloudapp.azure.com"
+    #   request.env["rack.url_scheme"] = "http"
+    # end
+
     if request.path == "/users/sign_in" && request.method == "GET"
       # redirect_to "https://fetch-detail-react.vercel.app/"
       redirect_to "http://localhost:3000/"

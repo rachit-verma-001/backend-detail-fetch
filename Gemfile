@@ -6,7 +6,8 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 6.0.0'
 # Use postgresql as the database for Active Record
-gem 'pg', '>= 0.18', '< 2.0'
+# gem 'pg', '>= 0.18', '< 2.0'
+gem 'sqlite3', '~> 1.4'
 # Use Puma as the app server
 gem 'puma', '~> 3.11'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
@@ -35,7 +36,7 @@ gem 'city-state'
 gem 'active_model_serializers', '~> 0.10.0'
 
 gem 'linkedin-scraper'
-
+gem 'geckodriver-helper'
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 gem 'rack-cors'
 gem "linkedin-oauth2", "~> 1.0"
@@ -43,6 +44,7 @@ gem "linkedin-oauth2", "~> 1.0"
  gem 'selenium-webdriver'
  gem 'nokogiri'
  gem 'dotenv-rails'
+ gem 'chromedriver-helper'
  gem 'webdrivers', '~> 4.0'
 gem "letter_opener", group: :development
 

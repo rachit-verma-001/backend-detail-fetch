@@ -11,14 +11,20 @@ class ProfileInformation::FetchInfo
 
   def login
     @driver.navigate.to("https://www.linkedin.com/login")
+    sleep(4)
     puts "[INFO]: Entering username"
+    # doc = Nokogiri::HTML(@driver.page_source).text
     @driver.find_element(:name, "session_key").send_keys("kushal@ausavi.com")
     puts "[INFO]: Entering password"
     @driver.find_element(:name, "session_password").send_keys("Punjab2017@")
     puts "[INFO]: Logging in"
+    sleep(4)
     @driver.find_element(:xpath, "//button").click
     wait = Selenium::WebDriver::Wait.new(:timout => 10)
     wait.until {@driver.find_element(:css, "body.ember-application")}
+# {
+#   driver: @driver.title
+# }
     company_data
   end
 
@@ -69,29 +75,19 @@ class ProfileInformation::FetchInfo
     sleep(4)
     doc = Nokogiri::HTML(@driver.page_source)
 
-    # http://thoughtwin.com/
-    # https://www.protonshub.com/?utm_source=Traffic&utm_medium=source&utm_campaign=Linkedin
-    # http://bit.ly/Systango
-
     website = doc.css(:xpath,"//span[@class='link-without-visited-state']")&.text&.strip&.split("\n")&.first
     uri = URI.parse(website)
     domain = PublicSuffix.parse(uri.host)
     domain=domain.domain
-    # domain = "mirrag"
-
     p "domain=#{domain}"
-
     @count = 0
-
     founders = []
     # founders << get_founders('ceo')
     # founders << get_founders('coo')
     # founders <<  get_founders('cto')
-
     @posts.each do |post|
       founders << get_founders(post,domain)
     end
-
     # employers_data= get_employee_data
 
     payload = {
@@ -110,6 +106,7 @@ class ProfileInformation::FetchInfo
 
     puts "[DONE]:"
     sleep(2)
+    # @driver.close
     @driver.quit
     employees = @company.employee_details
     {

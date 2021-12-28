@@ -1,6 +1,6 @@
 class CompanyDetail < ApplicationRecord
   has_many :employee_details, dependent: :destroy
-
+  serialize :posts
   validates_presence_of :name,:company_type,:url
   validates_uniqueness_of :url
 

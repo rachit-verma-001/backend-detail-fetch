@@ -10,30 +10,45 @@ class Api::V1::LinkedDataController < ApplicationController
   def resync
     begin
       attempts ||= 1
-      options = Selenium::WebDriver::Chrome::Options.new
-      options.add_argument('--ignore-cerfiticate-errors')
-      options.add_argument('--disable-popup-blocking')
-      options.add_argument('--disable-translate')
+      # username = "rachitverma_l1iQXU"
+      # access_key = "E3ye46J6xSBeXxv4P1nC"
+      # Selenium::WebDriver::Chrome::Service.driver_path = "/usr/bin/chromedriver"
+      # Selenium::WebDriver::Chrome::Service.driver_path = "/usr/bin/chromium-browser"
+      # Selenium::WebDriver::Chrome::Service.driver_path = "/mnt/c/GitRepos/backend_cloned/testapp/geckodriver"
+#       options = Selenium::WebDriver::Chrome::Options.new(args:["headless"])
+#       # options = Selenium::WebDriver::Firefox::Options.new(args:["headless"])
+#       options.add_argument('--ignore-cerfiticate-errors')
+#       options.add_argument('--disable-popup-blocking')
+#       options.add_argument('--disable-translate')
+#       options.add_argument('--enable-features=NetworkService,NetworkServiceInProcess')
+#       options.add_argument('--no-sandbox')
+#       options.add_argument('--disable-gpu')
+#       options.add_argument('--window-size=1920,1080')
+#       options.add_argument('--disable-extension')
+#       options.add_argument('--disable-dev-shm-usage')
       # options.add_argument("--app-id = agnfnpbfkijaoceganjckcbkagmobidoi")
-      options.add_extension("/home/rachit/Things/WebScrapping/mlhacebjlefifkldmkbilohcaiednbik-3.0.6-Crx4Chrome.com.crx")
-      driver = Selenium::WebDriver.for :chrome, options: options
+      # options.add_extension("/home/rachit/Things/WebScrapping/mlhacebjlefifkldmkbilohcaiednbik-3.0.6-Crx4Chrome.com.crx")
+      # driver = Selenium::WebDriver.for :chrome, options: options
+      options = Selenium::WebDriver::Firefox::Options.new(args:['-headless'])
+      driver = Selenium::WebDriver.for(:firefox, options: options)
       company = CompanyDetail.find(params[:company_id])
       name = company.name
-      # company.destroy! if company.present?
       profile = company.url+"/people"
-      # company = CompanyDetail.find_or_create_by(name:name)
       payload = ProfileInformation::FetchInfo.new.get_data(name, profile, company, driver)
       render json: payload
-      # render json:{success:true}
     rescue => e
-      driver.quit
-      if ((attempts += 1) <= 4)  # go back to begin block if condition ok
+      # driver.close 
+      driver.quit 
+
+      if ((attempts += 1) <= 2)  # go back to begin block if condition ok
         puts "<retrying..>"
         puts e
         retry # ⤴
       end
       # render json:{success:false, message:"No Such company details present, Please enter valid company details"}, status:422
-      render json:{success:false, message:"No Such company details present, Please enter valid company details"}, status:200
+      # render json:{success:false, message:"No Such company details present, Please enter valid company details"}, status:200
+
+      render json:{success:false, error:e}
     end
   end
 
