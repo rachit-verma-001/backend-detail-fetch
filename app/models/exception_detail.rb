@@ -1,0 +1,2 @@
+class ExceptionDetail < ApplicationRecord
+end

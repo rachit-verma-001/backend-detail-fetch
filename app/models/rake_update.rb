@@ -1,0 +1,2 @@
+class RakeUpdate < ApplicationRecord
+end

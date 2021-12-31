@@ -1,6 +1,7 @@
 class ProfileInformation::FetchInfo
 
-  def get_data(name, profile, company, driver)
+  def get_data(name, profile, company, driver, line)
+    @line = line
     @name = name
     @profile = profile
     @company  = company
@@ -10,34 +11,61 @@ class ProfileInformation::FetchInfo
   end
 
   def login
+    
+    
+    @line.update(line_number:15, completed:false)
+
     @driver.navigate.to("https://www.linkedin.com/login")
-    sleep(4)
+    sleep(7)
+
+    @line.update(line_number:20)
+
+
     puts "[INFO]: Entering username"
     # doc = Nokogiri::HTML(@driver.page_source).text
     @driver.find_element(:name, "session_key").send_keys("kushal@ausavi.com")
+    sleep(7)
+
+    @line.update(line_number:28)
+
     puts "[INFO]: Entering password"
     @driver.find_element(:name, "session_password").send_keys("Punjab2017@")
     puts "[INFO]: Logging in"
-    sleep(4)
+    sleep(7)
+
+
+    @line.update(line_number:36)
+
     @driver.find_element(:xpath, "//button").click
-    wait = Selenium::WebDriver::Wait.new(:timout => 10)
-    wait.until {@driver.find_element(:css, "body.ember-application")}
-# {
-#   driver: @driver.title
-# }
+    sleep(7)
+    # wait = Selenium::WebDriver::Wait.new(:timout => 10)
+    # wait.until {@driver.find_element(:css, "body.ember-application")}
+
+    @line.update(line_number:43)
+
     company_data
   end
 
   def company_data
     puts "[INFO]: Navigating to profile #{@profile}"
+    sleep(7)
+
+    @line.update(line_number:52)
 
     @driver.navigate.to(@profile)
-    wait = Selenium::WebDriver::Wait.new(:timout => 10)
-    wait.until {@driver.find_element(:css, "div.organization-outlet")}
+    # wait = Selenium::WebDriver::Wait.new(:timout => 10)
+    # wait.until {@driver.find_element(:css, "div.organization-outlet")}
+    sleep(7)
+
     puts "[INFO]: Scraping data"
 
-    sleep(4)
+    @line.update(line_number:61)
+
+    # sleep(4)
     doc = Nokogiri::HTML(@driver.page_source)
+
+
+    @line.update(line_number:67)
 
     name = doc.css("h1 span[dir=ltr]")
     name = name ? name.text : nil
@@ -71,9 +99,20 @@ class ProfileInformation::FetchInfo
     logo = doc.css("div.org-top-card-primary-content__logo-container img")&.first ? doc.css("div.org-top-card-primary-content__logo-container img")&.first["src"] : nil
     p "b logo=#{logo}"
 
+    @line.update(line_number:101)
+
+
     @driver.navigate.to("#{@company.url}/about")
-    sleep(4)
+
+    sleep(7)
+    
+    @line.update(line_number:108)
+
     doc = Nokogiri::HTML(@driver.page_source)
+
+    sleep(7)
+
+    @line.update(line_number:114)
 
     website = doc.css(:xpath,"//span[@class='link-without-visited-state']")&.text&.strip&.split("\n")&.first
     uri = URI.parse(website)
@@ -81,14 +120,23 @@ class ProfileInformation::FetchInfo
     domain=domain.domain
     p "domain=#{domain}"
     @count = 0
+
+    @line.update(line_number:123)
+
     founders = []
     # founders << get_founders('ceo')
     # founders << get_founders('coo')
     # founders <<  get_founders('cto')
-    @posts.each do |post|
-      founders << get_founders(post,domain)
-    end
+    # @posts.each do |post|
+    #   founders << get_founders(post,domain)
+    # end
+
+
+    founders << get_founders(@posts.join(","),domain)
+
     # employers_data= get_employee_data
+
+        @line.update(line_number:134)
 
     payload = {
       name: @name,
@@ -102,26 +150,46 @@ class ProfileInformation::FetchInfo
       # url: @profile
     }
 
+    
+
     @company.update!(payload)
+
+    @line.update(line_number:153)
 
     puts "[DONE]:"
     sleep(2)
     # @driver.close
-    @driver.quit
+
+    # @line.update(line_number:156)
+
+    # @driver.quit 
+
+    @line.update(line_number:163, completed:true )
+
     employees = @company.employee_details
     {
       company_detail:@company,
       founder_details: employees.where(role_id:Role.find_by(name:"Founder").id),
-      employee_details: employees.where(role_id:Role.find_by(name:"Employee").id)
+      employee_details: employees.where(role_id:Role.find_by(name:"Employee").id),
+      line:@line
     }
   end
 
   def get_founders(post, domain)
     p "inside founders"
+    sleep(7)
+    @line.update(line_number:174)
     @driver.navigate.to("#{@profile}/?keywords=#{post}")
-    sleep(4)
+    sleep(7)
+
+    @line.update(line_number:178)
+
     source  = @driver.page_source
     doc = Nokogiri::HTML(source)
+    sleep(7)
+
+    @line.update(line_number:184)
+
     names = []
     check=[]
     i = 0
@@ -136,10 +204,16 @@ class ProfileInformation::FetchInfo
           break
         else
           i=i+1
+          sleep(7)
+          @line.update(line_number:201)
           @driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
-          sleep(4)
+              @line.update(line_number:203)
+
+          sleep(7)
           source = @driver.page_source
           doc = Nokogiri::HTML(source)
+              @line.update(line_number:208)
+          sleep(7)
         end
       end
     # end
@@ -163,20 +237,32 @@ class ProfileInformation::FetchInfo
       names&.reject(&:blank?)&.each do |name|
 
         p "inside name = #{name}"
+        sleep(7)
 
-        @driver.navigate.to("#{@profile}/?keywords=#{post}")
-        sleep(4)
+        @line.update(line_number:235)
+
+        # @driver.navigate.to("#{@profile}/?keywords=#{post}")
+        @driver.navigate.to("#{@profile}/?keywords=#{name}")
+        sleep(7)
         # binding.pry
+    
+        @line.update(line_number:241, name:name)
+
         @driver.find_element(:xpath,"//div[@class='org-people-profile-card__profile-title t-black lt-line-clamp lt-line-clamp--single-line ember-view'][contains(.,'#{name.split(" ")[0]}')]")&.click
 
-        sleep(4)
+        sleep(7)
 
-        wait = Selenium::WebDriver::Wait.new(:timout => 10)
-        wait.until {@driver.find_element(:css, "div.text-body-medium")}
+        @line.update(line_number:247)
+        # wait = Selenium::WebDriver::Wait.new(:timout => 10)
+        # wait.until {@driver.find_element(:css, "div.text-body-medium")}
 
         source = @driver.page_source
 
         doc = Nokogiri::HTML(source)
+
+        sleep(7)
+
+        @line.update(line_number:257)
 
         city = doc.css(:xpath,"//span[@class='text-body-small inline t-black--light break-words']")&.text&.strip
 
@@ -191,19 +277,28 @@ class ProfileInformation::FetchInfo
 
         image = doc.css(:xpath,"//img[@width='200']")&.first ? doc.css(:xpath,"//img[@width='200']")&.first['src'] : nil
         p "image = #{image}"
+        sleep(7)
+
+        @line.update(line_number:275)
+
 
         @driver.find_element(:xpath, "//a[contains(.,'Contact info')]")&.click
 
-        sleep(2)
+        sleep(7)
 
+        @line.update(line_number:282)
+    
         source = @driver.page_source
 
         doc = Nokogiri::HTML(source)
 
+        @line.update(line_number:288)
+    
+        sleep(7)
+
         mobile = doc.css(:xpath,"//span[@class='t-14 t-black t-normal']")&.text&.strip
 
         p "mobile = #{mobile}"
-
 
         # if mobile == ""
         #   response1 =   HTTParty.post("https://api.apollo.io/v1/contacts",
@@ -232,6 +327,8 @@ class ProfileInformation::FetchInfo
 
         p "payoad = #{payload}"
 
+        @line.update(line_number:324)
+
         detail = @company.employee_details.where(first_name:payload[:first_name], last_name:payload[:last_name], email:payload[:email]).first
 
         unless detail.present?
@@ -239,12 +336,20 @@ class ProfileInformation::FetchInfo
         else
           detail.update(payload)
         end
+        sleep(7)
 
-        @driver.navigate.to("#{@profile}/?keywords=#{post}")
+        @line.update(line_number:335)
 
-        sleep(2)
-        source = @driver.page_source
-        doc = Nokogiri::HTML(source)
+        # @driver.navigate.to("#{@profile}/?keywords=#{post}")
+
+        sleep(7)
+
+        # @line.update(line_number:341)
+
+        # source = @driver.page_source
+        # doc = Nokogiri::HTML(source)
+        # @line.update(line_number:345)
+        # sleep(7)
       end
     end
     names

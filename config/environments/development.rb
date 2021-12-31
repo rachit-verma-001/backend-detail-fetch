@@ -68,10 +68,10 @@ Rails.application.configure do
   # config.hosts << "cb44-182-77-7-232.ngrok.io"
   # config.hosts << "4149-20-124-179-137.ngrok.io"
 
-  # config.hosts << "azure-test-vm-window.eastus.cloudapp.azure.com"
+  config.hosts << "azure-test-vm-window.eastus.cloudapp.azure.com"
 
 
-  config.hosts << "49d6-20-124-179-137.ngrok.io"
+  # config.hosts << "49d6-20-124-179-137.ngrok.io"
 
   # Raises error for missing translations.
   # config.action_view.raise_on_missing_translations = true

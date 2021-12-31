@@ -22,6 +22,7 @@ Rails.application.routes.draw do
         member do
           get :employees
           get :resyncing
+          put :sync
         end
       end
       devise_scope :user do

@@ -8,7 +8,7 @@ class Api::V1::LinkedDataController < ApplicationController
   # skip_before_action :verify_authenticity_token
 
   def resync
-    begin
+    
       attempts ||= 1
       # username = "rachitverma_l1iQXU"
       # access_key = "E3ye46J6xSBeXxv4P1nC"
@@ -29,26 +29,46 @@ class Api::V1::LinkedDataController < ApplicationController
       # options.add_argument("--app-id = agnfnpbfkijaoceganjckcbkagmobidoi")
       # options.add_extension("/home/rachit/Things/WebScrapping/mlhacebjlefifkldmkbilohcaiednbik-3.0.6-Crx4Chrome.com.crx")
       # driver = Selenium::WebDriver.for :chrome, options: options
-      options = Selenium::WebDriver::Firefox::Options.new(args:['-headless'])
-      driver = Selenium::WebDriver.for(:firefox, options: options)
-      company = CompanyDetail.find(params[:company_id])
-      name = company.name
-      profile = company.url+"/people"
-      payload = ProfileInformation::FetchInfo.new.get_data(name, profile, company, driver)
-      render json: payload
-    rescue => e
-      # driver.close 
-      driver.quit 
+      
+      # company = CompanyDetail.find(params[:company_id])
+      # company.update(resync_progress:"Syncing in Progress")
+      # payload  = FirefoxWorkerJob.perform_later(company)
+      # render json: payload
 
-      if ((attempts += 1) <= 2)  # go back to begin block if condition ok
-        puts "<retrying..>"
-        puts e
-        retry # ⤴
+
+
+
+
+      if CompanyDetail.where.not(id:company.id).where(resync_progress:"syncing in progress").present?
+        render json:{sucess: false, message:"wait for others to finish"}
+      else
+        begin
+          options = Selenium::WebDriver::Firefox::Options.new(args:['-headless'])
+          driver = Selenium::WebDriver.for(:firefox, options: options)
+          # company = CompanyDetail.find(params[:company_id])
+          ExceptionDetail.first.update(ex_status:"Running", company_detail_id:company.id)
+          name = company.name
+          profile = company.url+"/people"
+          line = company.line ? company.line : company.create_line
+          payload = ProfileInformation::FetchInfo.new.get_data(name, profile, company, driver, line)
+          company.update(resync_progress:"Synced")
+          ExceptionDetail.first.update(ex_status:"Completed")
+          driver.quit if driver
+          render json: payload
+        rescue => e
+          # driver.close 
+          driver.quit if driver
+
+          if ((attempts += 1) <= 2)  # go back to begin block if condition ok
+            puts "<retrying..>"
+            puts e
+            retry # ⤴
+          end
+        # render json:{success:false, message:"No Such company details present, Please enter valid company details"}, status:422
+        # render json:{success:false, message:"No Such company details present, Please enter valid company details"}, status:200
+
+        render json:{success:false, error:e, line:line}
       end
-      # render json:{success:false, message:"No Such company details present, Please enter valid company details"}, status:422
-      # render json:{success:false, message:"No Such company details present, Please enter valid company details"}, status:200
-
-      render json:{success:false, error:e}
     end
   end
 

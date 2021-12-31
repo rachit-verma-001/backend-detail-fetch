@@ -26,7 +26,8 @@ gem 'bootsnap', '>= 1.4.2', require: false
 # gem 'devise_token_auth'
 gem 'tiddle'
 gem "httparty"
-
+gem 'sidekiq'
+gem 'whenever'
 
 gem 'will_paginate'
 gem 'country_select'

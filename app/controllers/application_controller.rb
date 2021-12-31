@@ -12,12 +12,13 @@ class ApplicationController < ActionController::API
     # end
 
     if request.path == "/users/sign_in" && request.method == "GET"
-      # redirect_to "https://fetch-detail-react.vercel.app/"
-      redirect_to "http://localhost:3000/"
+      redirect_to "https://fetch-detail-react.vercel.app/"
+      # redirect_to "http://localhost:3000/"
     end
   end
 
   def error_generic(exception)
+    ExceptionDetail.first.update(ex_status:exception.message)
     render json:{success:false, message:exception.message}, status:200
   end
 
