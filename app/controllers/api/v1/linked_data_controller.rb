@@ -8,7 +8,7 @@ class Api::V1::LinkedDataController < ApplicationController
   # skip_before_action :verify_authenticity_token
 
   def resync
-    
+
       attempts ||= 1
       # username = "rachitverma_l1iQXU"
       # access_key = "E3ye46J6xSBeXxv4P1nC"
@@ -29,7 +29,7 @@ class Api::V1::LinkedDataController < ApplicationController
       # options.add_argument("--app-id = agnfnpbfkijaoceganjckcbkagmobidoi")
       # options.add_extension("/home/rachit/Things/WebScrapping/mlhacebjlefifkldmkbilohcaiednbik-3.0.6-Crx4Chrome.com.crx")
       # driver = Selenium::WebDriver.for :chrome, options: options
-      
+
       # company = CompanyDetail.find(params[:company_id])
       # company.update(resync_progress:"Syncing in Progress")
       # payload  = FirefoxWorkerJob.perform_later(company)
@@ -45,7 +45,7 @@ class Api::V1::LinkedDataController < ApplicationController
         begin
           options = Selenium::WebDriver::Firefox::Options.new(args:['-headless'])
           driver = Selenium::WebDriver.for(:firefox, options: options)
-          # company = CompanyDetail.find(params[:company_id])
+          company = CompanyDetail.find(params[:company_id])
           ExceptionDetail.first.update(ex_status:"Running", company_detail_id:company.id)
           name = company.name
           profile = company.url+"/people"
@@ -56,7 +56,7 @@ class Api::V1::LinkedDataController < ApplicationController
           driver.quit if driver
           render json: payload
         rescue => e
-          # driver.close 
+          # driver.close
           driver.quit if driver
 
           if ((attempts += 1) <= 2)  # go back to begin block if condition ok
