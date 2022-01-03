@@ -14,7 +14,10 @@ namespace :firefox_data do
 	# end
 
 
-	companies = CompanyDetail.where.not(resync_progress:"Synced")&.order(created_at: :asc)
+	# companies = CompanyDetail.where.not(resync_progress:"Synced")&.order(created_at: :asc)&.limit(3)
+
+	companies = CompanyDetail.where.not(resync_progress:"Synced")&.order(created_at: :asc)&.limit(1)
+
 
 		if companies
 			companies.each do |company|
@@ -54,13 +57,8 @@ namespace :firefox_data do
 						{success:false, error:e, line:line}
 					end
 
-
-
-
 			end
 		end
-
-
 
   end
 end

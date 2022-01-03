@@ -11,7 +11,7 @@ set :output, "log/cron_log.log"
 # Tz = "Asia/Kuala_Lumpur"
 # case @environment
 
-# when 'development'	
+# when 'development'
 # 	every 1.minute do
 # 	  rake "firefox_data:sync_job", environment: "development"
 # 	end
