@@ -14,7 +14,7 @@ namespace :firefox_data do
 	# end
 
 
-	companies = CompanyDetail.where.not(resync_progress:"Synced")&.order(created_at: :asc)&.limit(3)
+	companies = CompanyDetail.where.not(resync_progress:"Synced")&.order(created_at: :asc)
 
 		if companies
 			companies.each do |company|

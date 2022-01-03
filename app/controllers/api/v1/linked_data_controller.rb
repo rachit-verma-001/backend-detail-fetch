@@ -39,13 +39,17 @@ class Api::V1::LinkedDataController < ApplicationController
 
 
 
+
+
+
+      company = CompanyDetail.find(params[:company_id])
+
       if CompanyDetail.where.not(id:company.id).where(resync_progress:"syncing in progress").present?
         render json:{sucess: false, message:"wait for others to finish"}
       else
         begin
           options = Selenium::WebDriver::Firefox::Options.new(args:['-headless'])
           driver = Selenium::WebDriver.for(:firefox, options: options)
-          company = CompanyDetail.find(params[:company_id])
           ExceptionDetail.first.update(ex_status:"Running", company_detail_id:company.id)
           name = company.name
           profile = company.url+"/people"

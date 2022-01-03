@@ -48,7 +48,7 @@ class ProfileInformation::FetchInfo
 
   def company_data
     puts "[INFO]: Navigating to profile #{@profile}"
-    sleep(7)
+    # sleep(7)
 
     @line.update(line_number:52)
 
@@ -177,16 +177,18 @@ class ProfileInformation::FetchInfo
 
   def get_founders(post, domain)
     p "inside founders"
-    sleep(7)
+    sleep(4)
     @line.update(line_number:174)
     @driver.navigate.to("#{@profile}/?keywords=#{post}")
-    sleep(7)
+    # sleep(7)
+    sleep(4)
 
     @line.update(line_number:178)
 
     source  = @driver.page_source
     doc = Nokogiri::HTML(source)
-    sleep(7)
+    # sleep(7)
+    sleep(4)
 
     @line.update(line_number:184)
 
@@ -204,12 +206,12 @@ class ProfileInformation::FetchInfo
           break
         else
           i=i+1
-          sleep(7)
+          # sleep(7)
           @line.update(line_number:201)
           @driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
               @line.update(line_number:203)
 
-          sleep(7)
+          sleep(5)
           source = @driver.page_source
           doc = Nokogiri::HTML(source)
               @line.update(line_number:208)
