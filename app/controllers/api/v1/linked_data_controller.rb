@@ -7,7 +7,31 @@ class Api::V1::LinkedDataController < ApplicationController
   # before_action :authenticate_api_v1_user!
   # skip_before_action :verify_authenticity_token
 
+
   def resync
+    attempts ||= 1
+    begin
+      company = CompanyDetail.find(params[:company_id])
+      company.update(prev_url:company.url) unless company.prev_url
+      line = company.line ? company.line : company.create_line
+      payload = ProfileInformation::AppoloFetchInfo.new.get_data(company, line)
+      company.update(resync_progress:"Synced")
+      ExceptionDetail.first.update(ex_status:"Completed")
+      render json: payload
+    rescue => e
+
+      if ((attempts += 1) <= 2)  # go back to begin block if condition ok
+        puts "<retrying..>"
+        puts e
+        retry # ⤴
+      end
+
+      render json:{success:false, error:e, line:line}
+    end
+  end
+
+
+  def prev_resync
 
       attempts ||= 1
       # username = "rachitverma_l1iQXU"
