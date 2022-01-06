@@ -11,7 +11,7 @@ class Api::V1::CompaniesController < ApplicationController
 
 
   def resyncing
-    @company.update(resync_progress:params[:resync_progress])
+    @company.update(resync_progress:params[:resync_progress]) if params[:resync_progress] =="syncing in progress"
     render json:{status:@company.resync_progress, companies:
       ActiveModelSerializers::SerializableResource.new(CompanyDetail.all, each_serializer: Api::V1::CompaniesSerializer)}
   end
