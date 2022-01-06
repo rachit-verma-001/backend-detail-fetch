@@ -41,6 +41,8 @@ class ProfileInformation::AppoloFetchInfo
       city = "#{people[5]}, #{people[6]}, #{people[7]}"
       mobile = people[8]&.join(",")
       email = people[4]
+      email = "#{name&.split[0]&.downcase}.#{name&.split[1]&.downcase}@#{domain}" if (email == "email_not_unlocked@domain.com" || email.blank?)
+
       designation = people[2]
       image = people[3]
       payload = {
