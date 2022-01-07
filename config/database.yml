@@ -39,12 +39,12 @@ development:
 #   database: <%= ENV.fetch("DB_NAME") { 'cheers_on_demand_backend_production' } %>
 
 
-# production:
-#   <<: *default
-#   host: detail-fetch-backend.postgres.database.azure.com
-#   database: detail-fetch-db
-#   username: postgres@detail-fetch-backend
-#   password: Protonshub@321
+production:
+  <<: *default
+  host: detail-fetch-backend.postgres.database.azure.com
+  database: detail-fetch-db
+  username: postgres@detail-fetch-backend
+  password: Protonshub@321
 
 
 
