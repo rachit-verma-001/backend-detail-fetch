@@ -6,8 +6,8 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 6.0.0'
 # Use postgresql as the database for Active Record
-# gem 'pg', '>= 0.18', '< 2.0'
-gem 'sqlite3', '~> 1.4'
+gem 'pg', '>= 0.18', '< 2.0'
+# gem 'sqlite3', '~> 1.4'
 # Use Puma as the app server
 gem 'puma', '~> 3.11'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
@@ -16,6 +16,7 @@ gem 'puma', '~> 3.11'
 # gem 'redis', '~> 4.0'
 # Use Active Model has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
+gem "sequel"
 
 # Use Active Storage variant
 # gem 'image_processing', '~> 1.2'
@@ -28,12 +29,12 @@ gem 'tiddle'
 gem "httparty"
 gem 'sidekiq'
 gem 'whenever'
-
 gem 'will_paginate'
 gem 'country_select'
 gem 'countries'
 gem 'carmen-rails'
 gem 'city-state'
+
 gem 'active_model_serializers', '~> 0.10.0'
 
 gem 'linkedin-scraper'
@@ -59,6 +60,11 @@ group :development do
   gem 'listen', '>= 3.0.5', '< 3.2'
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
+  gem 'capistrano',         require: false
+  gem 'capistrano-rvm',     require: false
+  gem 'capistrano-rails',   require: false
+  gem 'capistrano-bundler', require: false
+  gem 'capistrano3-puma',   require: false
 end
 
 group :test do
