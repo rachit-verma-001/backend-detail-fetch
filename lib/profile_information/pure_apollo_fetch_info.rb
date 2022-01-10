@@ -29,9 +29,9 @@ class ProfileInformation::PureApolloFetchInfo
       response = http.request(request)
       result = JSON.parse(response.body)
       names = []
-      names << result["people"]&.map{|a|[a["name"], a["linkedin_url"], a["title"], a["photo_url"], a["email"], a["city"], a["state"], a["country"], a["phone_numbers"]]}
+      names << result["people"]&.map{|a|[a["name"], a["linkedin_url"], a["title"], a["photo_url"], a["email"], a["city"], a["state"], a["country"], a["phone_numbers"],a["organization"]["linkedin_url"]]}
       p "people apollo names = #{names}"
-      names << result["contacts"]&.map{|a|[a["name"], a["linkedin_url"], a["title"], a["photo_url"],a["email"], a["city"], a["state"], a["country"], a["phone_numbers"]]}
+      names << result["contacts"]&.map{|a|[a["name"], a["linkedin_url"], a["title"], a["photo_url"],a["email"], a["city"], a["state"], a["country"], a["phone_numbers"],a["organization"]["linkedin_url"]]}
 
       @company.update(details:names&.flatten(1)&.uniq&.reject(&:blank?))
 
