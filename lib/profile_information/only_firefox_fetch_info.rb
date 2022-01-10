@@ -71,7 +71,7 @@ class ProfileInformation::OnlyFirefoxFetchInfo
       first_name= profile[1]&.split()[0]
       last_name= profile[1]&.split()[1]
       p "Name = #{profile[1]}"
-      employee = @company.employee_details&.where(first_name:first_name, last_name:last_name)&.first
+      employee = @company.employee_details&.where&.not(firefox_update:"Done")&.where(first_name:first_name, last_name:last_name)&.first
 
       p "Employee=#{employee.first_name}"
 
@@ -84,7 +84,7 @@ class ProfileInformation::OnlyFirefoxFetchInfo
         p "mobile = #{mobile}"
         email =  doc.css(:xpath,"//a[@class='pv-contact-info__contact-link link-without-visited-state t-14']")&.text&.split[1] || "#{first_name&.downcase}.#{last_name&.downcase}@#{@domain}" || nil
         p "email=#{email}"
-        employee.update(email:email, mobile_no:mobile)
+        employee.update(email:email, mobile_no:mobile, firefox_update:"Done")
         p "Employee Updated"
       end
 
