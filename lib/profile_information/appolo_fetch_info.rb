@@ -8,6 +8,7 @@ class ProfileInformation::AppoloFetchInfo
   end
 
   def company_data
+    p "Company Data URL = #{@company.url}"
     uri = URI.parse(@company.url)
     domain = PublicSuffix.parse(uri.host)
     domain=domain.domain
@@ -28,7 +29,9 @@ class ProfileInformation::AppoloFetchInfo
     response = http.request(request)
     result = JSON.parse(response.body)
 
+
     if domain=="linkedin.com"
+      p "Bad URL"
       @company.update(resync_progress:"Bad Url")
       raise Exception.new("Bad Url")
     end
@@ -55,7 +58,8 @@ class ProfileInformation::AppoloFetchInfo
         designation: designation,
         image: image,
         # role_id:Role.find_by(name:'Founder').id
-        role_id:Role.find_by(name:"Employee").id
+        role_id:Role.find_by(name:"Employee").id,
+        linedin_url:people[1]
       }
       p "payoad = #{payload}"
       @line.update(line_number:324)

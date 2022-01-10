@@ -19,8 +19,8 @@ set :output, "log/cron_log.log"
 # end
 
 
-	every 30.minute do
-	  rake "firefox_data:sync_job"
+	every 2.minutes do
+	  rake "firefox_data:sync_job", environment: "development"
 	end
 
 

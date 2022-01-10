@@ -1,63 +1,82 @@
 namespace :firefox_data do
   desc "TODO"
   task sync_job: :environment do
- #  	companies = CompanyDetail.where.not(resync_progress:"Synced")
- #    companies.each do |company|
-	#   FirefoxWorkerJob.new.perform(company)
+	companies = CompanyDetail.where.not(resync_progress:"Bad Url", url_status:"started")&.where&.not(resync_progress:"Synced")&.order(created_at: :asc)&.limit(3)
+
+	# if companies
+	# 	companies.each do |company|		
+	# 		unless company.id == 276
+	# 		  company.update(prev_url:company.url) unless company.prev_url
+ #   			 attempts ||= 1
+			  
+	# 		  begin
+	# 	      options = Selenium::WebDriver::Firefox::Options.new(args:['-headless'])
+	# 	      driver = Selenium::WebDriver.for(:firefox, options: options)
+	# 	      options.add_argument('--window-size=1920,1080')
+ #      		options.add_argument('--disable-dev-shm-usage')
+		      
+	# 	      # 
+	# 	      # company = CompanyDetail.find(params[:company_id])
+	# 	      company.update(prev_url:company.url) unless company.prev_url
+	# 	      line = company.line ? company.line : company.create_line
+	# 	      payload = ProfileInformation::AppoloLinkedin.new.get_data(company, line, driver)
+	# 	      company.update(resync_progress:"Synced")
+	# 	      ExceptionDetail.first.update(ex_status:"Completed")
+	# 			rescue => e
+	# 	    	company.update(resync_progress:"Improper Synced") unless company.resync_progress=="Bad Url"
+	# 	      if ((attempts += 1) <= 2)  # go back to begin block if condition ok
+	# 	        puts "<retrying..>"
+	# 	        puts e
+	# 	        retry # ⤴
+	# 	      end
+	# 	      company
+	# 	      # render json:{success:false, error:e, line:line}
+	# 	    end
+	# 		end
+	# 	end
 	# end
-	# FirefoxWorkerJob.new.perform(CompanyDetail.first)
 
-	# if CompanyDetail.first.foundation_year == "1999"
-	# 	CompanyDetail.first.update(foundation_year:"2021", company_type:"Service Based")
-	# else
-	# 	CompanyDetail.first.update(foundation_year:"1999", company_type:"Other")
-	# end
-
-
-	# companies = CompanyDetail.where.not(resync_progress:"Synced")&.order(created_at: :asc)&.limit(3)
-
-	companies = CompanyDetail.where.not(resync_progress:"Synced")&.order(created_at: :asc)&.limit(1)
 
 
 		if companies
 			companies.each do |company|
+ 		        
+ 		        unless CompanyDetail.where.not(id:company.id).where(resync_progress:"syncing in progress").present?
+											attempts ||= 1
+								p "company id= #{company.id}"
+ 		        	if company.id <= 1675
+						    begin
+						      company.update(prev_url:company.url) unless company.prev_url
+						      line = company.line ? company.line : company.create_line
+						      company.update(resync_progress:"syncing in progress")
+						      p "company name = #{company.name}"
+						      payload = ProfileInformation::AppoloFetchInfo.new.get_data(company, line)
+						      company.update(resync_progress:"Synced")
+						      ExceptionDetail.first.update(ex_status:"Completed")
+						      # render json: payload
+						      p "Time =#{Time.now}"
+						      payload
+						    rescue => e
+						    	p "Inside Rescue resync progres == #{company.resync_progress}"
+						    	
+						    	company.update(resync_progress:"Improper Synced") unless company.resync_progress=="Bad Url"						      
+						    	company.update(resync_progress:"Bad Url") if  e.message.split(":")&.first=="bad URI(is not URI?)"
+						      if ((attempts += 1) <= 2)  # go back to begin block if condition ok
+						        puts "<retrying..>"
+						        puts e
+						        retry # ⤴
+						      end
+						      company
+						      # render json:{success:false, error:e, line:line}
+						    end
 
-				begin
-					attempts ||= 1
-						options = Selenium::WebDriver::Firefox::Options.new(args:['-headless'])
-						driver = Selenium::WebDriver.for(:firefox, options: options)
-						# company = CompanyDetail.find(params[:company_id])
-						ExceptionDetail.first.update(ex_status:"Running", company_detail_id:company.id)
-						RakeUpdate.first.update(status:"started", company_detail_id:company.id)
-						name = company.name
-						profile = "#{company.url}/people"
-						line = company.line ? company.line : company.create_line
-						payload = ProfileInformation::FetchInfo.new.get_data(name, profile, company, driver, line)
-						company.update(resync_progress:"Synced")
-						driver.quit if driver
-						RakeUpdate.first.update(status:"completed", company_detail_id:company.id)
-						ExceptionDetail.first.update(ex_status:"Completed")
-						payload
-						# render json: payload
-					rescue => e
-						# driver.close
-						driver.quit if driver
-						RakeUpdate.first.update(status:"rescued", company_detail_id:company.id)
+						   end
 
-						company.update(resync_progress:"Synced")
-						if ((attempts += 1) <= 2)  # go back to begin block if condition ok
-							puts "<retrying..>"
-							puts e
-							retry # ⤴
-						end
-						# render json:{success:false, message:"No Such company details present, Please enter valid company details"}, status:422
-						# render json:{success:false, message:"No Such company details present, Please enter valid company details"}, status:200
 
-						# render json:{success:false, error:e, line:line}
-						{success:false, error:e, line:line}
-					end
+				end
 
 			end
+
 		end
 
   end

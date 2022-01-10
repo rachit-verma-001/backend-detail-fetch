@@ -18,6 +18,7 @@ class ApplicationController < ActionController::API
   end
 
   def error_generic(exception)
+   
     ExceptionDetail.first.update(ex_status:exception.message)
     render json:{success:false, message:exception.message}, status:200
   end

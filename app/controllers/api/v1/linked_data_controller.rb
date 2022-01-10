@@ -7,6 +7,30 @@ class Api::V1::LinkedDataController < ApplicationController
   # before_action :authenticate_api_v1_user!
   # skip_before_action :verify_authenticity_token
 
+  def link_apolo_resync
+    attempts ||= 1
+    begin
+      options = Selenium::WebDriver::Firefox::Options.new(args:['-headless'])
+      driver = Selenium::WebDriver.for(:firefox, options: options)
+      company = CompanyDetail.find(params[:company_id])
+      company.update(prev_url:company.url) unless company.prev_url
+      line = company.line ? company.line : company.create_line
+      payload = ProfileInformation::AppoloLinkedin.new.get_data(company, line, driver)
+      company.update(resync_progress:"Synced")
+      ExceptionDetail.first.update(ex_status:"Completed")
+      render json: payload
+    rescue => e
+      driver.quit if driver
+      if ((attempts += 1) <= 2)  # go back to begin block if condition ok
+        puts "<retrying..>"
+        puts e
+        retry # ⤴
+      end
+      render json:{success:false, error:e, line:line}
+    end
+  end
+
+
 
   def resync
     attempts ||= 1

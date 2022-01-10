@@ -87,7 +87,7 @@ class Api::V1::CompaniesController < ApplicationController
   private
 
   def company_params
-    params.permit(:name,:url,:company_type,:foundation_year, posts:[])
+    params.permit(:name,:url,:company_type,:foundation_year, :url_status, :prev_url, posts:[])
   end
 
   def get_company
