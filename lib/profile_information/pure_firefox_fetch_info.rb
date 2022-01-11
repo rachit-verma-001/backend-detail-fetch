@@ -125,14 +125,33 @@ class ProfileInformation::PureFirefoxFetchInfo
         p "inside name = #{name}"
         sleep(4)
 
-
-
         unless @company.employee_details&.pluck(:first_name, :last_name).map{|a|["#{a[0]} #{a[1]}"] }&.flatten&.include? name
 
           p "Inside Unless name = #{name}"
 
-          @driver.navigate.to("#{@profile}/?keywords=#{name}")
+          @driver.navigate.to("#{@profile}/?keywords=#{post}")
           sleep(4)
+
+          source = @driver.page_source
+          doc = Nokogiri::HTML(source)
+
+
+          pnames = doc.css(:xpath,"//div[@class='org-people-profile-card__profile-title t-black lt-line-clamp lt-line-clamp--single-line ember-view']")&.map{|a|a.text.strip}
+
+          unless pnames.include? name
+            loop do
+              p "inside Loop"
+              @driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
+              sleep(5)
+              source = @driver.page_source
+              doc = Nokogiri::HTML(source)
+              pnames = doc.css(:xpath,"//div[@class='org-people-profile-card__profile-title t-black lt-line-clamp lt-line-clamp--single-line ember-view']")&.map{|a|a.text.strip}
+              p "pnames = #{pnames}"
+              p "name=#{name}"
+              break if pnames.include? name
+            end
+          end
+
           @driver.find_element(:xpath,"//div[@class='org-people-profile-card__profile-title t-black lt-line-clamp lt-line-clamp--single-line ember-view'][contains(.,'#{name.split(" ")[0]}')]")&.click
           sleep(4)
           source = @driver.page_source
@@ -189,130 +208,3 @@ class ProfileInformation::PureFirefoxFetchInfo
   end
 
 end
-
-
-
-
-
-
-      # doc.css(:xpath, "//div[@class='org-people-profile-card__profile-title t-black lt-line-clamp lt-line-clamp--single-line ember-view']")&.each do |t_loop|
-
-
-      # @driver.navigate.to("#{@profile}/?keywords=#{post}")
-      # sleep(4)
-
-      # source  = @driver.page_source
-      # doc = Nokogiri::HTML(source)
-      # n_count = 0
-
-
-      #     p "Inside Loop i=#{i}, n_count=#{n_count}"
-
-      #     t_name = t_loop&.text&.strip
-
-      #     p "tname = #{t_name}"
-
-      #     # @driver.navigate.to("#{@profile}/?keywords=#{post}")
-      #     # sleep(4)
-
-      #     # source  = @driver.page_source
-      #     # doc = Nokogiri::HTML(source)
-      #     # n_count = 0
-
-
-        # loop do
-        # end #Remove
-        # @driver.navigate.to("#{@profile}/?keywords=#{post}")
-      # end #Remove
-
-
-
-
-
-
-
-
-
-
-      # if names.include? t_loop&.text&.strip
-
-      #   unless @company.employee_details&.pluck(:first_name, :last_name).map{|a|["#{a[0]} #{a[1]}"] }&.flatten&.include? t_name
-
-
-
-      #     p "Inside Unless Fetching Profiles...."
-
-      #     # @driver.navigate.to("#{@profile}/?keywords=#{name}")
-      #     @driver.navigate.to("#{@profile}/?keywords=#{post}")
-
-      #     sleep(4)
-
-
-      #     # doc.css(:xpath, "//div[@class='org-people-profile-card__profile-title t-black lt-line-clamp lt-line-clamp--single-line ember-view']").each do |it_loop|
-
-
-      #       p "Inside IT LOOP "
-      #       # if it_loop&.text&.strip ==  name
-
-      #         p "INSIDE LOOP NAME = #{t_name}"
-      #         @driver.find_element(:xpath,"//div[@class='org-people-profile-card__profile-title t-black lt-line-clamp lt-line-clamp--single-line ember-view'][contains(.,'#{t_name.split(" ")[0]}')]")&.click
-      #         sleep(4)
-      #         name = t_name
-      #         source = @driver.page_source
-      #         doc = Nokogiri::HTML(source)
-      #         city = doc.css(:xpath,"//span[@class='text-body-small inline t-black--light break-words']")&.text&.strip
-      #         p "city = #{city}"
-      #         description = doc.css(:xpath, "//div[@class='text-body-medium break-words']")&.text&.strip
-      #         p "description = #{description}"
-      #         designation = description
-      #         p "designation = #{designation}"
-      #         image = doc.css(:xpath,"//img[@width='200']")&.first ? doc.css(:xpath,"//img[@width='200']")&.first['src'] : nil
-      #         p "image = #{image}"
-      #         p "Fetching Contact Info....."
-      #         @driver.find_element(:xpath, "//a[contains(.,'Contact info')]")&.click
-      #         sleep(4)
-      #         source = @driver.page_source
-      #         doc = Nokogiri::HTML(source)
-      #         mobile = doc.css(:xpath,"//span[@class='t-14 t-black t-normal']")&.text&.strip
-      #         p "mobile = #{mobile}"
-      #         email =  doc.css(:xpath,"//a[@class='pv-contact-info__contact-link link-without-visited-state t-14']")&.text&.split[1] || "#{name&.split[0]&.downcase}.#{name&.split[1]&.downcase}@#{domain}" || nil
-
-      #         p "email=#{email}"
-
-      #         payload = {
-      #           first_name: name&.split()[0],
-      #           last_name: name&.split()[1],
-      #           city: city,
-      #           # description: description,
-      #           email:email,
-      #           mobile_no:mobile,
-      #           designation: designation,
-      #           image: image,
-      #           # role_id:Role.find_by(name:'Founder').id
-      #           role_id:Role.find_by(name:"Employee").id
-      #         }
-      #         p "payoad = #{payload}"
-      #         detail = @company.employee_details.where(first_name:payload[:first_name], last_name:payload[:last_name], email:payload[:email]).first
-
-      #         unless detail.present?
-      #           @company.employee_details.create!(payload)
-      #         else
-      #           detail.update(payload)
-      #         end
-      #       # end #Remove This
-
-      #     # end #Remove This
-
-      #   end
-      # else
-
-      #   p "Inside Else n_count=#{n_count}, i=#{i}"
-      #   binding.pry
-
-      #     break if ncount == i
-      #     n_count = n_count+1
-      #     @driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
-      #     sleep(5)
-      #     source = @driver.page_source
-      #     doc = Nokogiri::HTML(source)
-      # end
