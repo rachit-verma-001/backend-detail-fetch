@@ -120,12 +120,15 @@ class ProfileInformation::PureFirefoxFetchInfo
 
         end
       end
+      names = names&.reject(&:blank?) - @company.bug_names
 
-      names&.reject(&:blank?)&.each do |name|
+      names&.each do |name|
         p "inside name = #{name}"
         sleep(4)
 
         unless @company.employee_details&.pluck(:first_name, :last_name).map{|a|["#{a[0]} #{a[1]}"] }&.flatten&.include? name
+
+          @company.bug_names << name
 
           p "Inside Unless name = #{name}"
 
@@ -153,6 +156,7 @@ class ProfileInformation::PureFirefoxFetchInfo
           end
 
           @driver.find_element(:xpath,"//div[@class='org-people-profile-card__profile-title t-black lt-line-clamp lt-line-clamp--single-line ember-view'][contains(.,'#{name.split(" ")[0]}')]")&.click
+
           sleep(4)
           source = @driver.page_source
           doc = Nokogiri::HTML(source)
@@ -193,7 +197,14 @@ class ProfileInformation::PureFirefoxFetchInfo
           }
           p "payoad = #{payload}"
           detail = @company.employee_details.where(first_name:payload[:first_name], last_name:payload[:last_name], email:payload[:email]).first
+          if @company.bug_names.include? name
+            bug_names = @company.bug_names
+            bug_names = bug_names.delete(name)
+            @company.bug_names = bug_names
+            @company.save
+            # @company.bug_names.delete(name)
 
+          end
           unless detail.present?
             @company.employee_details.create!(payload)
           else
@@ -202,6 +213,7 @@ class ProfileInformation::PureFirefoxFetchInfo
         end
       end
     end
+
     @company.done_posts << post
     @company.save
     names
