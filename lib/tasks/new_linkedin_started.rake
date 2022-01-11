@@ -5,16 +5,19 @@ namespace :new_linkedin_started do
     apollo_ids = CompanyDetail.is_pure_apollo_data.pluck(:ids)
     companies = CompanyDetail.where.not(id:apollo_ids)&.where(no_of_employees:nil, firefox_status:"New Linkedin Started")&.order(created_at: :asc)
 
+
+
     begin
 			attempts ||= 1
-			options = Selenium::WebDriver::Firefox::Options.new()
-			@driver = Selenium::WebDriver.for(:firefox, options: options)
+      		options = Selenium::WebDriver::Chrome::Options.new()
+
+			@driver = Selenium::WebDriver.for :chrome, options: options
 			@driver.navigate.to("https://www.linkedin.com/login")
 			sleep(4)
-			@driver.find_element(:name, "session_key").send_keys("rachitverma.001@gmail.com")
+			@driver.find_element(:name, "session_key").send_keys("kushal@ausavi.com")
 			sleep(4)
 			puts "[INFO]: Entering password"
-			@driver.find_element(:name, "session_password").send_keys("gmail8871338693")
+			@driver.find_element(:name, "session_password").send_keys("Punjab2017@")
 			puts "[INFO]: Logging in"
 			sleep(4)
 			@driver.find_element(:xpath, "//button").click
@@ -29,8 +32,8 @@ namespace :new_linkedin_started do
 					# if url.present?
 						name = company.name
 						profile = "#{company.url}/people"
-            company.update(firefox_status:"New Linkedin Started")
-						ProfileInformation::PureFirefoxFetchInfo.new.get_data(name, profile, company, @driver)
+                        company.update(firefox_status:"New Linkedin Started")
+						ProfileInformation::PureFirefoxFetchInfo.new.get_data(name, profile, company, @driver, @company.url)
 						company.update(firefox_status:"New Linkedin Done", resync_progress:"Synced")
 						p "DONE"
 
