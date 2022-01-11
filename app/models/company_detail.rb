@@ -7,7 +7,24 @@ class CompanyDetail < ApplicationRecord
   before_save :add_default_progress
 
   PAGE = 1
+
   PER_PAGE = 10
+
+
+
+  def self.new_linkedin_started_data
+    where(linkedin_status:"New Linkedin Started")
+  end
+
+  def self.new_linkedin_done_data
+    where(linkedin_status:"New Linkedin Done")
+  end
+
+
+  def self.is_pure_apollo_data
+    where(is_pure_apollo:true)
+  end
+
 
   def add_default_progress
 

@@ -2,7 +2,8 @@ namespace :new_linkedin_started do
   desc "TODO"
   task sync_job: :environment do
 
-    companies = CompanyDetail.where(no_of_employees:nil, firefox_status:"New Linkedin Started")&.order(created_at: :asc)
+    apollo_ids = CompanyDetail.is_pure_apollo_data.pluck(:ids)
+    companies = CompanyDetail.where.not(id:apollo_ids)&.where(no_of_employees:nil, firefox_status:"New Linkedin Started")&.order(created_at: :asc)
 
     begin
 			attempts ||= 1
